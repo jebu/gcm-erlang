@@ -34,8 +34,10 @@ update_error_fun(Name, Fun) ->
 start_link(Name, Key) ->
     start_link(Name, Key, fun log_error/2).
 
+start_link(Name, Key, ErrorFun) when is_atom(Name) ->
+    gen_server:start_link({local, Name}, ?MODULE, [Key, ErrorFun], []);
 start_link(Name, Key, ErrorFun) ->
-    gen_server:start_link({local, Name}, ?MODULE, [Key, ErrorFun], []).
+    gen_server:start_link(Name, ?MODULE, [Key, ErrorFun], []).
 
 init([Key, ErrorFun]) ->
     {ok, #state{key=Key, retry_after=0, error_fun=ErrorFun}}.
