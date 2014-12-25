@@ -25,8 +25,10 @@ sync_push(Name, RegIds, Message) ->
     gen_server:call(Name, {send, RegIds, Message}).
 
 %% OTP
+start_link(Name, Key) when is_atom(Name) ->
+    gen_server:start_link({local, Name}, ?MODULE, [Key], []);
 start_link(Name, Key) ->
-    gen_server:start_link({local, Name}, ?MODULE, [Key], []).
+    gen_server:start_link(Name, ?MODULE, [Key], []).
 
 init([Key]) ->
     {ok, #state{key=Key}}.
