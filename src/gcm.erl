@@ -75,7 +75,7 @@ code_change(_OldVsn, State, _Extra) ->
 
 %% Internal
 do_push(RegIds, Message, Key, ErrorFun) ->
-    lager:debug("Sending message: ~p to reg ids: ~p~n", [Message, RegIds]),
+    lager:debug("Sending message to reg ids: ~p~n", [RegIds]),
     case gcm_api:push(RegIds, Message, Key) of
         {ok, GCMResult} ->
             handle_result(GCMResult, RegIds, ErrorFun);
