@@ -75,7 +75,7 @@ code_change(_OldVsn, State, _Extra) ->
 
 %% Internal
 do_push(RegIds, Message, Key, ErrorFun) ->
-    error_logger:info_msg("Sending message: ~p to reg ids: ~p~n", [Message, RegIds]),
+    lager:debug("Sending message: ~p to reg ids: ~p~n", [Message, RegIds]),
     case gcm_api:push(RegIds, Message, Key) of
         {ok, GCMResult} ->
             handle_result(GCMResult, RegIds, ErrorFun);
@@ -129,30 +129,30 @@ parse_result(Result, RegId, ErrorFun) ->
     end.
 
 log_error(<<"NewRegistrationId">>, {RegId, NewRegId}) ->
-    error_logger:info_msg("Message sent. Update id ~p with new id ~p.~n", [RegId, NewRegId]),
+    lager:info("Message sent. Update id ~p with new id ~p.~n", [RegId, NewRegId]),
     ok;
 
 log_error(<<"Unavailable">>, RegId) ->
     %% The server couldn't process the request in time. Retry later with exponential backoff.
-    error_logger:error_msg("unavailable ~p~n", [RegId]),
+    lager:error("unavailable ~p~n", [RegId]),
     ok;
 
 log_error(<<"InternalServerError">>, RegId) ->
     % GCM had an internal server error. Retry later with exponential backoff.
-    error_logger:error_msg("internal server error ~p~n", [RegId]),
+    lager:error("internal server error ~p~n", [RegId]),
     ok;
 
 log_error(<<"InvalidRegistration">>, RegId) ->
     %% Invalid registration id in database.
-    error_logger:error_msg("invalid registration ~p~n", [RegId]),
+    lager:error("invalid registration ~p~n", [RegId]),
     ok;
 
 log_error(<<"NotRegistered">>, RegId) ->
     %% Application removed. Delete device from database.
-    error_logger:error_msg("not registered ~p~n", [RegId]),
+    lager:error("not registered ~p~n", [RegId]),
     ok;
 
 log_error(UnexpectedError, RegId) ->
     %% There was an unexpected error that couldn't be identified.
-    error_logger:error_msg("unexpected error ~p in ~p~n", [UnexpectedError, RegId]),
+    lager:error("unexpected error ~p in ~p~n", [UnexpectedError, RegId]),
     ok.
